@@ -1,0 +1,78 @@
+////////////////////////////////////////////
+local scriptingHost = ScriptingHost();
+////////////////////////////////////////////
+// local sbcPath = "c:/dev/opensbc/debug/";
+local sbcPath = "$default";
+local daemonSwitch = "-d";
+local sysLogPort = "50514";
+local proxyInterface = "sip:*:5060";
+local proxyRPCPort = "5678";
+local b2bInterfaceAddress = "*";
+local b2bSIPPort_1 = "65060";
+local b2bInterface_1 = "sip:" + b2bInterfaceAddress + ":" + b2bSIPPort_1;
+local b2bRPCPort_1 = "5679";
+local b2bSIPPort_2 = "65062";
+local b2bInterface_2 = "sip:" + b2bInterfaceAddress + ":" + b2bSIPPort_2;
+local b2bRPCPort_2 = "5680";
+
+
+scriptingHost.SetB2BInterfaceAddress( b2bInterfaceAddress );
+scriptingHost.AppendB2BPort( b2bSIPPort_1 );
+scriptingHost.AppendB2BPort( b2bSIPPort_2 );
+
+/////////////////////////////////////////////
+/// start the syslog server
+scriptingHost.StartSysLog( "127.0.0.1", sysLogPort, "logs", "b2bua", "" );
+scriptingHost.SetProxyXMLRPCAddress( "http://localhost:" + proxyRPCPort + "/RPC2" );
+
+local b2bApp = "opensbc";
+local b2bAppId = "oss.b2b-1";
+local b2bPID = "opensbc-" + b2bAppId + ".pid"
+local b2bArgs =  daemonSwitch + " -P 1";
+b2bArgs += " -X \"" + b2bInterface_1 + ";";
+b2bArgs += "iid=" + b2bAppId + ";";
+b2bArgs += "ua-mode=B2BOnlyMode;";
+b2bArgs += "ua-sub-mode=B2B;";
+b2bArgs += "config-mode=XMLRPCClientProvider;";
+b2bArgs += "xml-rpc-server=http://localhost:10010/RPC2/;xml-rpc-port=" + b2bRPCPort_1 + ";";
+b2bArgs += "xml-rpc-registrar=" + "http://localhost:" + proxyRPCPort + "/RPC2";
+b2bArgs += ";syslog=127.0.0.1:" + sysLogPort;
+b2bArgs += "\"";
+
+print( "Running " + b2bAppId );
+scriptingHost.AddProcess( b2bAppId, sbcPath, b2bApp, b2bArgs, b2bPID, b2bInterface_1, 1  );
+
+b2bApp = "opensbc";
+b2bAppId = "oss.b2b-2";
+b2bPID = "opensbc-"+  b2bAppId + ".pid";
+b2bArgs =  daemonSwitch + " -P 2";
+b2bArgs += " -X \"" + b2bInterface_2 + ";";
+b2bArgs += "iid=" + b2bAppId + ";";
+b2bArgs += "ua-mode=B2BOnlyMode;";
+b2bArgs += "ua-sub-mode=B2B;";
+b2bArgs += "config-mode=XMLRPCClientProvider;";
+b2bArgs += "xml-rpc-server=http://localhost:10010/RPC2/;xml-rpc-port=" + b2bRPCPort_2 + ";";
+b2bArgs += "xml-rpc-registrar=" + "http://localhost:" + proxyRPCPort + "/RPC2";
+b2bArgs += ";syslog=127.0.0.1:" + sysLogPort;
+b2bArgs += "\"";
+
+print( "Running " + b2bAppId );
+scriptingHost.AddProcess( b2bAppId, sbcPath, b2bApp, b2bArgs, b2bPID, b2bInterface_2, 1 );
+
+local proxyApp = "opensbc";
+local proxyAppId = "oss.proxy";
+local proxyPID = "opensbc-" + proxyAppId + ".pid";
+local proxyArgs =  daemonSwitch + " -P 3";
+proxyArgs += " -X \"" + proxyInterface + ";";
+proxyArgs += "iid=" + proxyAppId + ";";
+proxyArgs += "ua-mode=ProxyOnlyMode;";
+proxyArgs += "ua-sub-mode=LB;";
+proxyArgs += "config-mode=XMLRPCClientProvider;";
+proxyArgs += "xml-rpc-server=http://localhost:10010/RPC2/;xml-rpc-port=" + proxyRPCPort ;
+proxyArgs += ";syslog=127.0.0.1:" + sysLogPort;
+proxyArgs += "\"";
+
+print( "Running " + proxyAppId );
+scriptingHost.AddProcess( "oss.proxy", sbcPath, proxyApp, proxyArgs, proxyPID, proxyInterface, 1 );
+
+

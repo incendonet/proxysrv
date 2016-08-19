@@ -1,0 +1,6 @@
+
+
+local scriptingHost = ScriptingHost();
+scriptingHost.RemoveProcess( "oss.proxy", 1 );
+scriptingHost.RemoveProcess( "oss.b2b-1", 1 );
+scriptingHost.RemoveProcess( "oss.b2b-2", 1 );

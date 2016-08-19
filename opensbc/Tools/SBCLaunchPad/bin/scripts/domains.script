@@ -1,0 +1,9 @@
+
+
+//local scriptingHost = ScriptingHost();
+//local proxyRPCPort = "5678";
+
+//////////////////////////////////////////////////////////////////////////
+// local b2bRoutes = "sip:192.168.2.81:605060 | sip:192.168.2.81:605061";
+// scriptingHost.AddRelayRoute( "[sip:*192.168.2.81*]" + b2bRoutes             ,"http://localhost:" + proxyRPCPort + "/RPC2" );
+// scriptingHost.AddRelayRoute( "[sip:*interop.opensipstack.org*]" + b2bRoutes  ,"http://localhost:" + proxyRPCPort + "/RPC2" );

@@ -1,0 +1,23 @@
+OPENSIPSTACKDIR	= @OPENSIPSTACKDIR@
+HAS_RTBECLIENT = @HAS_RTBECLIENT@
+
+PROG  := opensbc
+
+SOURCES := Main.cxx
+SOURCES += SBCCallHandler.cxx
+SOURCES += SBCRoutingHandler.cxx
+SOURCES += SBCAuthHandler.cxx
+SOURCES += OpenSBC.cxx
+SOURCES += Router.cxx
+SOURCES += RouteRecord.cxx
+
+include @OPENSIPSTACKDIR@/make/opensipstack.mak
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,189 @@
+#include <ptbuildopts.h>
+
+#undef HAS_OPAL
+
+#define BUILD_MINIMAL 1
+
+#if !BUILD_MINIMAL
+#undef HAS_SQLITE
+#undef HAS_CPPSQLITE
+#undef HAS_LIBJINGLE
+#endif
+
+
+
+
+/************************************************************************/
+
+#ifdef P_EXPAT
+#define ENABLE_ECCI 1
+#if !BUILD_MINIMAL
+#define ENABLE_BAMBOO 1
+#endif
+#endif
+
+/************************************************************************/
+#if HAS_SQLITE
+#if defined( _MSC_VER )
+#define SQLITE_LIBRARY "@SQLITEDIR@/sqlite3.lib"
+#pragma include_alias( <sqlite3.h>, <@SQLITEDIR@/sqlite3.h> )
+#endif
+#endif
+
+/************************************************************************/
+
+#if HAS_CPPSQLITE
+#if defined( _MSC_VER )
+#pragma include_alias( <CppSQLite3.h>, <@SQLITEDIR@/CppSQLite3.h> )
+#pragma include_alias( <CppSQLite3.cpp>, <@SQLITEDIR@/CppSQLite3.cpp> )
+#endif
+#endif
+
+
+/************************************************************************/
+
+#if HAS_OPAL
+#define OPAL_CORE_THREAD_COUNT 1
+#define OPAL_UA_THREAD_COUNT 1
+#define OPAL_STACK_SIZE 1024 * 2
+#define OPAL_REGISTRAR_THREAD_COUNT 1
+#define OPAL_REGISTRAR_STACK_SIZE 1024
+#define OPAL_REGISTRAR_TIMEOUT 20000
+#define OPAL_OSS_PREFIX "sip"
+#endif
+
+
+/************************************************************************/
+
+/// TRANSACTION definitions
+#define ICT_MAX_REDIRECT_ATTEMPTS 10
+#define SIP_MAX_TRANSACTION_LIFE_SPAN 300000 /// 5 minutes
+
+/// STACK definitions
+#define LOG_INSTANCE_COUNTER 0
+#define FSM_THREAD_COUNT 10
+#define NICT_USE_TIMER_K 1
+#define SIP_UDP_DEFAULT_BUFFER_SIZE 32768
+
+/************************************************************************/
+#define GS_HASH_KEY_1 0x5060
+#define GS_HASH_KEY_2 0x50
+
+
+
+/************************************************************************/
+
+#if HAS_LIBJINGLE
+#define ENABLE_XMPP 1
+#define LIBJINGLE_DIR "@LIBJINGLEDIR@"
+
+#if defined( _MSC_VER )
+#pragma include_alias( "talk/xmpp/asyncsocket.h","@LIBJINGLEDIR@/xmpp/asyncsocket.h" )
+#pragma include_alias( "talk/xmpp/saslhandler.h","@LIBJINGLEDIR@/xmpp/saslhandler.h" )
+#pragma include_alias( "talk/xmpp/xmppengineimpl.h","@LIBJINGLEDIR@/xmpp/xmppengineimpl.h" )
+#pragma include_alias( "talk/xmpp/constants.h","@LIBJINGLEDIR@/xmpp/constants.h" )
+#pragma include_alias( "talk/xmpp/saslmechanism.h","@LIBJINGLEDIR@/xmpp/saslmechanism.h" )
+#pragma include_alias( "talk/xmpp/xmpplogintask.h","@LIBJINGLEDIR@/xmpp/xmpplogintask.h" )
+#pragma include_alias( "talk/xmpp/jid.h","@LIBJINGLEDIR@/xmpp/jid.h" )
+#pragma include_alias( "talk/xmpp/saslplainmechanism.h","@LIBJINGLEDIR@/xmpp/saslplainmechanism.h" )
+#pragma include_alias( "talk/xmpp/xmpppassword.h","@LIBJINGLEDIR@/xmpp/xmpppassword.h" )
+#pragma include_alias( "talk/xmpp/plainsaslhandler.h","@LIBJINGLEDIR@/xmpp/plainsaslhandler.h" )
+#pragma include_alias( "talk/xmpp/xmppclient.h","@LIBJINGLEDIR@/xmpp/xmppclient.h" )
+#pragma include_alias( "talk/xmpp/xmppstanzaparser.h","@LIBJINGLEDIR@/xmpp/xmppstanzaparser.h" )
+#pragma include_alias( "talk/xmpp/prexmppauth.h","@LIBJINGLEDIR@/xmpp/prexmppauth.h" )
+#pragma include_alias( "talk/xmpp/xmppclientsettings.h","@LIBJINGLEDIR@/xmpp/xmppclientsettings.h" )
+#pragma include_alias( "talk/xmpp/xmpptask.h","@LIBJINGLEDIR@/xmpp/xmpptask.h" )
+#pragma include_alias( "talk/xmpp/saslcookiemechanism.h","@LIBJINGLEDIR@/xmpp/saslcookiemechanism.h" )
+#pragma include_alias( "talk/xmpp/xmppengine.h","@LIBJINGLEDIR@/xmpp/xmppengine.h" )
+
+#pragma include_alias( "talk/base/schanneladapter.h","@LIBJINGLEDIR@/base/schanneladapter.h" )
+#pragma include_alias( "talk/base/asyncfile.h","@LIBJINGLEDIR@/base/asyncfile.h" )
+#pragma include_alias( "talk/base/scoped_ptr.h","@LIBJINGLEDIR@/base/scoped_ptr.h" )
+#pragma include_alias( "talk/base/asyncpacketsocket.h","@LIBJINGLEDIR@/base/asyncpacketsocket.h" )
+#pragma include_alias( "talk/base/sec_buffer.h","@LIBJINGLEDIR@/base/sec_buffer.h" )
+#pragma include_alias( "talk/base/asyncsocket.h","@LIBJINGLEDIR@/base/asyncsocket.h" )
+#pragma include_alias( "talk/base/sigslot.h","@LIBJINGLEDIR@/base/sigslot.h" )
+#pragma include_alias( "talk/base/asynctcpsocket.h","@LIBJINGLEDIR@/base/asynctcpsocket.h" )
+#pragma include_alias( "talk/base/socket.h","@LIBJINGLEDIR@/base/socket.h" )
+#pragma include_alias( "talk/base/asyncudpsocket.h","@LIBJINGLEDIR@/base/asyncudpsocket.h" )
+#pragma include_alias( "talk/base/socketadapters.h","@LIBJINGLEDIR@/base/socketadapters.h" )
+#pragma include_alias( "talk/base/base64.h","@LIBJINGLEDIR@/base/base64.h" )
+#pragma include_alias( "talk/base/socketaddress.h","@LIBJINGLEDIR@/base/socketaddress.h" )
+#pragma include_alias( "talk/base/basicdefs.h","@LIBJINGLEDIR@/base/basicdefs.h" )
+#pragma include_alias( "talk/base/socketaddresspair.h","@LIBJINGLEDIR@/base/socketaddresspair.h" )
+#pragma include_alias( "talk/base/basictypes.h","@LIBJINGLEDIR@/base/basictypes.h" )
+#pragma include_alias( "talk/base/socketfactory.h","@LIBJINGLEDIR@/base/socketfactory.h" )
+#pragma include_alias( "talk/base/bytebuffer.h","@LIBJINGLEDIR@/base/bytebuffer.h" )
+#pragma include_alias( "talk/base/socketserver.h","@LIBJINGLEDIR@/base/socketserver.h" )
+#pragma include_alias( "talk/base/byteorder.h","@LIBJINGLEDIR@/base/byteorder.h" )
+#pragma include_alias( "talk/base/ssladapter.h","@LIBJINGLEDIR@/base/ssladapter.h" )
+#pragma include_alias( "talk/base/common.h","@LIBJINGLEDIR@/base/common.h" )
+#pragma include_alias( "talk/base/stl_decl.h","@LIBJINGLEDIR@/base/stl_decl.h" )
+#pragma include_alias( "talk/base/criticalsection.h","@LIBJINGLEDIR@/base/criticalsection.h" )
+#pragma include_alias( "talk/base/stream.h","@LIBJINGLEDIR@/base/stream.h" )
+#pragma include_alias( "talk/base/host.h","@LIBJINGLEDIR@/base/host.h" )
+#pragma include_alias( "talk/base/stringutils.h","@LIBJINGLEDIR@/base/stringutils.h" )
+#pragma include_alias( "talk/base/linked_ptr.h","@LIBJINGLEDIR@/base/linked_ptr.h" )
+#pragma include_alias( "talk/base/task.h","@LIBJINGLEDIR@/base/task.h" )
+#pragma include_alias( "talk/base/logging.h","@LIBJINGLEDIR@/base/logging.h" )
+#pragma include_alias( "talk/base/taskrunner.h","@LIBJINGLEDIR@/base/taskrunner.h" )
+#pragma include_alias( "talk/base/md5.h","@LIBJINGLEDIR@/base/md5.h" )
+#pragma include_alias( "talk/base/thread.h","@LIBJINGLEDIR@/base/thread.h" )
+#pragma include_alias( "talk/base/messagequeue.h","@LIBJINGLEDIR@/base/messagequeue.h" )
+#pragma include_alias( "talk/base/time.h","@LIBJINGLEDIR@/base/time.h" )
+#pragma include_alias( "talk/base/network.h","@LIBJINGLEDIR@/base/network.h" )
+#pragma include_alias( "talk/base/win32.h","@LIBJINGLEDIR@/base/win32.h" )
+#pragma include_alias( "talk/base/openssladapter.h","@LIBJINGLEDIR@/base/openssladapter.h" )
+#pragma include_alias( "talk/base/win32socketserver.h","@LIBJINGLEDIR@/base/win32socketserver.h" )
+#pragma include_alias( "talk/base/physicalsocketserver.h","@LIBJINGLEDIR@/base/physicalsocketserver.h" )
+#pragma include_alias( "talk/base/winfirewall.h","@LIBJINGLEDIR@/base/winfirewall.h" )
+#pragma include_alias( "talk/base/proxyinfo.h","@LIBJINGLEDIR@/base/proxyinfo.h" )
+#pragma include_alias( "talk/base/winping.h","@LIBJINGLEDIR@/base/winping.h" )
+
+#pragma include_alias( "talk/p2p/base/port.h","@LIBJINGLEDIR@/p2p/base/port.h" )
+#pragma include_alias( "talk/p2p/base/candidate.h","@LIBJINGLEDIR@/p2p/base/candidate.h" )
+#pragma include_alias( "talk/p2p/base/session.h","@LIBJINGLEDIR@/p2p/base/session.h" )
+#pragma include_alias( "talk/p2p/base/stun.h","@LIBJINGLEDIR@/p2p/base/stun.h" )
+#pragma include_alias( "talk/p2p/base/helpers.h","@LIBJINGLEDIR@/p2p/base/helpers.h" )
+#pragma include_alias( "talk/p2p/base/sessiondescription.h","@LIBJINGLEDIR@/p2p/base/sessiondescription.h" )
+#pragma include_alias( "talk/p2p/base/stunport.h","@LIBJINGLEDIR@/p2p/base/stunport.h" )
+#pragma include_alias( "talk/p2p/base/p2psocket.h","@LIBJINGLEDIR@/p2p/base/p2psocket.h" )
+#pragma include_alias( "talk/p2p/base/sessionid.h","@LIBJINGLEDIR@/p2p/base/sessionid.h" )
+#pragma include_alias( "talk/p2p/base/stunrequest.h","@LIBJINGLEDIR@/p2p/base/stunrequest.h" )
+#pragma include_alias( "talk/p2p/base/sessionmanager.h","@LIBJINGLEDIR@/p2p/base/sessionmanager.h" )
+#pragma include_alias( "talk/p2p/base/stunserver.h","@LIBJINGLEDIR@/p2p/base/stunserver.h" )
+#pragma include_alias( "talk/p2p/base/portallocator.h","@LIBJINGLEDIR@/p2p/base/portallocator.h" )
+#pragma include_alias( "talk/p2p/base/sessionmessage.h","@LIBJINGLEDIR@/p2p/base/sessionmessage.h" )
+#pragma include_alias( "talk/p2p/base/tcpport.h","@LIBJINGLEDIR@/p2p/base/tcpport.h" )
+#pragma include_alias( "talk/p2p/base/pseudotcp.h","@LIBJINGLEDIR@/p2p/base/pseudotcp.h" )
+#pragma include_alias( "talk/p2p/base/sessionmessagefactory.h","@LIBJINGLEDIR@/p2p/base/sessionmessagefactory.h" )
+#pragma include_alias( "talk/p2p/base/udpport.h","@LIBJINGLEDIR@/p2p/base/udpport.h" )
+#pragma include_alias( "talk/p2p/base/relayport.h","@LIBJINGLEDIR@/p2p/base/relayport.h" )
+#pragma include_alias( "talk/p2p/base/sessionresponsemessage.h","@LIBJINGLEDIR@/p2p/base/sessionresponsemessage.h" )
+#pragma include_alias( "talk/p2p/base/relayserver.h","@LIBJINGLEDIR@/p2p/base/relayserver.h" )
+#pragma include_alias( "talk/p2p/base/socketmanager.h","@LIBJINGLEDIR@/p2p/base/socketmanager.h" )
+
+#pragma include_alias( "talk/xmllite/qname.h","@LIBJINGLEDIR@/xmllite/qname.h" )
+#pragma include_alias( "talk/xmllite/xmlconstants.h","@LIBJINGLEDIR@/xmllite/xmlconstants.h" )
+#pragma include_alias( "talk/xmllite/xmlnsstack.h","@LIBJINGLEDIR@/xmllite/xmlnsstack.h" )
+#pragma include_alias( "talk/xmllite/xmlprinter.h","@LIBJINGLEDIR@/xmllite/xmlprinter.h" )
+#pragma include_alias( "talk/xmllite/xmlbuilder.h","@LIBJINGLEDIR@/xmllite/xmlbuilder.h" )
+#pragma include_alias( "talk/xmllite/xmlelement.h","@LIBJINGLEDIR@/xmllite/xmlelement.h" )
+#pragma include_alias( "talk/xmllite/xmlparser.h","@LIBJINGLEDIR@/xmllite/xmlparser.h" )
+
+#ifdef _DEBUG
+#define LIBJINGLE_LIBDIR "Debug"
+#else
+#define LIBJINGLE_LIBDIR "Release"
+#endif
+
+#define LIBJINGLE_LIBRARY "@LIBJINGLEDIR@/" LIBJINGLE_LIBDIR "/libjingle.lib"
+
+#endif
+#endif
+
+/************************************************************************/
+
+
+
+

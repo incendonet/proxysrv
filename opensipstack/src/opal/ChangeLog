@@ -1,0 +1,37 @@
+2006-06-10 19:18  csoutheren
+
+	* src/h323/h4601.cxx: Added pragma for old gcc versions
+
+2006-06-10 10:40  dsandras
+
+	* src/sip/sipep.cxx: Backported fix from HEAD.
+
+2006-06-10 10:37  dsandras
+
+	* src/sip/sipep.cxx: Look for the expires field in the PDU if not
+	  present in the contact header.
+
+2006-06-09 02:17  csoutheren
+
+	* src/h323/h323.cxx: Fixed warning under gcc
+
+2006-06-08 23:22  csoutheren
+
+	* include/h323/h323con.h, include/opal/connection.h,
+	  src/opal/connection.cxx, src/sip/sipcon.cxx: Implemented mapping
+	  between SIP release codes and Q.931 codes as specified  by RFC
+	  3398
+
+2006-06-08 08:32  csoutheren
+
+	* src/win32/opal_lib.vcproj: Added H4601
+
+2006-06-08 08:27  shorne
+
+	* include/h323/h4601.h, src/h323/h4601.cxx: Resnc Opal and OpenH323
+	  versions
+
+2006-06-08 02:06  csoutheren
+
+	* opal_cfg.dxy: Updated doc version number
+

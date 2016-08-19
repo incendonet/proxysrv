@@ -1,0 +1,37 @@
+OPENSIPSTACKDIR	= @OPENSIPSTACKDIR@
+
+PROG  := opensbc-launcher
+TARGET  := bin/opensbc-launcher
+
+SOURCES := ProcessMonitor.cxx
+SOURCES += SBCLaunchPad.cxx
+SOURCES += ShellUtils.cxx
+SOURCES += SBCSysLog.cxx
+
+
+include @OPENSIPSTACKDIR@/make/opensipstack.mak
+
+
+LIBDIRS += ../SQPlus/lib
+
+
+LDFLAGS	    += -L ../SQPlus/lib
+
+LDLIBS	    += -lsqplus
+SYSLIBS     += -lsqplus
+
+
+STDCCFLAGS  += -I ../SQPlus/sqplus
+STDCCFLAGS  += -I ../SQPlus/include
+
+optnoshared ::
+	cp ../../$(OBJDIR)/opensbc bin/opensbc
+
+
+
+
+
+
+
+
+

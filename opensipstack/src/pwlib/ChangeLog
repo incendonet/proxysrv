@@ -1,0 +1,350 @@
+2006-06-07 03:13  hfriederich
+
+	* src/ptlib/common/jidctflt.cxx: Fixing compiler error on Apple x86
+	  machines
+
+2006-06-06 18:00  dereksmithies
+
+	* samples/vidtest/main.cxx: Fix erroneous help message.
+
+2006-05-29 13:40  dsandras
+
+	* plugins/sound_sunaudio/: sound_sunaudio.cxx: Applied patch from
+	  Brian Lu <brian lu sun com>. Thanks!
+
+2006-05-28 18:57  csoutheren
+
+	* version.h: Incremented version number
+
+2006-05-28 18:33  csoutheren
+
+	* plugins/sound_sunaudio/: Makefile, sound_sunaudio.cxx,
+	  sound_sunaudio.h: Copied Sun audio driver files to Phobos branch
+
+2006-05-28 14:03  dsandras
+
+	* src/ptlib/common/: tinyjpeg.cxx: Applied patch from Brian Lu
+	  <brian lu sun com> to fix compilation issues on OpenSolaris.
+	  Thanks!
+
+2006-05-26 17:05  hfriederich
+
+	* src/ptclib/pssl.cxx: Fixing compilation under Mac OS X
+
+2006-05-25 18:28  csoutheren
+
+	* include/ptlib/thread.h: Fixed compilation under gcc 4.0
+
+2006-05-23 21:28  dereksmithies
+
+	* samples/ptimer/: main.cxx, main.h: add separate thread to get the
+	  timer to start.  Add option to check if the timer has started.
+	  Fix use of the parameters.
+
+2006-05-23 17:28  csoutheren
+
+	* src/ptlib/common/osutils.cxx: Add timer protection for backwards
+	  running clocks
+
+2006-05-23 17:11  csoutheren
+
+	* include/ptlib/thread.h: Fixed compilation under gcc
+
+2006-05-22 23:36  dereksmithies
+
+	* samples/ptimer/: Makefile, main.cxx, main.h, precompile.cxx,
+	  precompile.h, ptimer.dsp, ptimer.dsw, version.h: Initial release
+	  of a test program to examine the operation of PTimer.
+
+2006-05-22 19:58  csoutheren
+
+	* include/ptlib/thread.h: Add templates for creating threads
+
+2006-05-22 19:57  csoutheren
+
+	* src/ptlib/common/osutils.cxx: Fix race condition in timer startup
+	  (maybe)
+
+2006-05-17 13:41  dsandras
+
+	* plugins/sound_alsa/sound_alsa.cxx: Backported fix from HEAD.
+
+2006-05-17 13:40  dsandras
+
+	* plugins/sound_alsa/sound_alsa.cxx: Do not explicitely free the
+	  cache as it could create some weird race conditions.
+
+2006-05-17 13:35  dsandras
+
+	* src/ptlib/common/tinyjpeg.cxx: Backported fix from HEAD thanks to
+	  Martin Rubli <martin rubli logitech com>.  Thanks!
+
+2006-05-17 13:34  dsandras
+
+	* src/ptlib/common/tinyjpeg.cxx: Fixed parsing of JPEG data that
+	  contains DHT markers thanks to Martin Rubli <martin rubli
+	  logitech com>. Thanks!
+
+2006-05-16 06:10  shorne
+
+	* src/ptlib/common/vconvert.cxx: Removed warning message MSVC 6
+
+2006-05-15 18:11  dereksmithies
+
+	* configure, configure.ac, make/ptbuildopts.mak.in, make/unix.mak:
+	  Use -ggdb -O0 -g3 to provide more information to the debugger,
+	  and force all  optimisation to be off. Initial tests show: this
+	  improves linux debugging.
+
+2006-05-06 10:30  dsandras
+
+	* plugins/vidinput_v4l2/vidinput_v4l2.cxx: Backport from HEAD.
+
+2006-05-06 10:29  dsandras
+
+	* plugins/vidinput_v4l2/vidinput_v4l2.cxx: Applied patch from
+	  Martin Rubli <martin rubli logitech com> to fix framerate and
+	  computation issues. Thanks a lot!
+
+2006-04-30 16:28  dsandras
+
+	* src/ptlib/common/vconvert.cxx,
+	  plugins/vidinput_dc/video4dc1394.cxx,
+	  plugins/vidinput_dc/videoio1394dc.h: Backport from HEAD.
+
+2006-04-30 16:26  dsandras
+
+	* src/ptlib/common/vconvert.cxx: Fixed green color problem when
+	  converting images in some of the color formats used by the iSight
+	  thanks to Luc Saillard <luc saillard org>.
+
+2006-04-30 16:25  dsandras
+
+	* plugins/vidinput_dc/: video4dc1394.cxx, videoio1394dc.h: Fixed
+	  resolution detection thanks to Luc Saillard <luc saillard org>.
+	  Thanks a lot!
+
+2006-04-29 09:34  csoutheren
+
+	* samples/xmpptest/ReadMe.txt: Removed files to be compatible with
+	  Debian packaging guidelines
+
+2006-04-25 19:25  rjongbloed
+
+	* src/ptclib/speex_echo/PAEC.vcproj: Moved object files into lib
+	  subdirectory (again)
+
+2006-04-25 19:13  rjongbloed
+
+	* src/ptclib/speex_echo/PAEC.vcproj: Moved object files into lib
+	  subdirectory
+
+2006-04-24 05:53  rjongbloed
+
+	* include/ptlib/msos/: ptlib_2003.dtf, ptlibd_2003.dtf: Update
+	  symbols
+
+2006-04-23 15:21  dsandras
+
+	* src/ptlib/common/vconvert.cxx: Backported fix from HEAD.
+
+2006-04-23 15:20  dsandras
+
+	* src/ptlib/common/vconvert.cxx: Added resizing capability for VYUY
+	  YUYV formats thanks to Luc Saillard.	Many thanks!
+
+2006-04-23 13:19  dsandras
+
+	* plugins/sound_oss/sound_oss.cxx: Backport from HEAD.
+
+2006-04-23 13:16  dsandras
+
+	* plugins/sound_oss/sound_oss.cxx: Fixed OSS plugin when there is
+	  no resampling.
+
+2006-04-22 08:36  dsandras
+
+	* src/ptclib/pdns.cxx: More backports from HEAD.
+
+2006-04-22 08:35  dsandras
+
+	* src/ptclib/pdns.cxx: Fixed wrong behavior with different
+	  priorities when building the priorities list. Fixes Ekiga bug
+	  #339314.
+
+2006-04-18 23:10  csoutheren
+
+	* src/ptlib/common/videoio.cxx: Fix problem when using converter
+	  when frame size not supported
+
+2006-04-18 23:09  csoutheren
+
+	* src/ptlib/common/vconvert.cxx: Add special case conversion from
+	  QCIF to CIF
+
+2006-04-18 23:09  csoutheren
+
+	* include/ptclib/pvfiledev.h, src/ptclib/pvfiledev.cxx: Allow frame
+	  size conversions
+
+2006-04-14 03:01  dereksmithies
+
+	* samples/audio/audio.cxx: Minor tidyup, totally close the sound
+	  device, so that there is only 2 (and no more than two) available
+	  PSoundChannel devices.
+
+2006-04-12 05:43  dsandras
+
+	* src/ptclib/pdns.cxx: More backports from HEAD.
+
+2006-04-12 05:38  csoutheren
+
+	* src/ptclib/pdns.cxx: Fixed problem with looping in SRV records
+	  thanks to Damien Sandras
+
+2006-04-10 18:57  csoutheren
+
+	* include/ptclib/pwavfile.h, include/ptlib/contain.h,
+	  include/ptlib/object.h, src/ptclib/pwavfile.cxx: Checked in
+	  changes to remove some warnings with gcc effc++ flag
+
+2006-04-09 17:27  dereksmithies
+
+	* samples/audio/.cvsignore: Add ignorance, so cvs does not generate
+	  tiresome warnings about working files.
+
+2006-04-09 17:22  dereksmithies
+
+	* src/ptclib/pwavfile.cxx: Fix a warning about comparison of signed
+	  and unsigned numbers.
+
+2006-04-09 06:44  csoutheren
+
+	* include/ptlib/msos/ptlib/contain.h: And then refix VS.net 2003
+
+2006-04-09 06:03  csoutheren
+
+	* include/ptlib/msos/ptlib/contain.h, src/ptlib/common/sockets.cxx,
+	  src/ptlib/msos/ethsock.cxx, src/ptlib/msos/ptlib.cxx,
+	  src/ptlib/msos/sound_win32.cxx, src/ptlib/msos/svcproc.cxx,
+	  src/ptlib/msos/win32.cxx, src/ptlib/msos/wincfg.cxx: Remove
+	  warnings on VS.net 2005
+
+2006-04-09 02:08  dereksmithies
+
+	* samples/audio/: audio.cxx, audio.h: Add reporting functions.	Use
+	  the selected device to open the sound card for volume levels.
+
+2006-04-09 02:05  rjongbloed
+
+	* include/ptlib/ipsock.h, include/ptlib/pstring.h,
+	  src/ptlib/common/sockets.cxx: Moved output stream operator for
+	  PString from sockets code to string code and fixed   its
+	  implemetation to continue to use PrintOn. Why it was added is
+	  unknown, probably   a compiler issue, but it should not be in a
+	  random source file!
+
+2006-04-09 00:13  dereksmithies
+
+	* samples/audio/: audio.cxx, audio.h: add a means to write the
+	  collected audio to disk (as a wav file),    or to the trace log
+	  (as text data)
+
+2006-04-08 23:28  dereksmithies
+
+	* samples/safetest/main.cxx: Make it 64 bit safe.
+
+2006-04-05 19:39  csoutheren
+
+	* include/ptclib/pwavfile.h, src/ptclib/pwavfile.cxx: Ensure
+	  autoconvert format is preserved across file close
+
+2006-03-29 17:28  dereksmithies
+
+	* samples/threadex/main.cxx: Fix use of null pointer.
+
+2006-03-29 17:18  dereksmithies
+
+	* samples/threadex/main.cxx: Remove compiler warning about unused
+	  variable.
+
+2006-03-29 15:13  dsandras
+
+	* plugins/vidinput_avc/vidinput_avc.cxx: Backports from HEAD.
+
+2006-03-29 15:11  dsandras
+
+	* plugins/vidinput_avc/vidinput_avc.cxx: Fixed color inversion
+	  problem thanks to Julien Puydt <julien puydt free fr>.  Thanks!
+
+2006-03-27 15:46  rjongbloed
+
+	* include/ptlib/msos/: ptlib_2003.dtf, ptlibd_2003.dtf: Update
+	  symbols
+
+2006-03-25 03:01  dereksmithies
+
+	* samples/safetest/: main.cxx, main.h: Add reporting options, and
+	  different methods for spawning threads. All stable and reliable.
+
+2006-03-24 17:39  dereksmithies
+
+	* src/ptlib/common/jidctflt.cxx: Put cvs commit messages into this
+	  file.
+
+2006-03-24 17:29  dereksmithies
+
+	* src/ptlib/common/jidctflt.cxx: Code uses inline assembly, which
+	  does not compile on an AMD64 bit box.  Disable the inline
+	  assembly for all 64 bit boxes.  In my view, the assembly should
+	  be removed for all cases.
+
+2006-03-22 23:07  dereksmithies
+
+	* samples/safetest/: main.cxx, main.h: Fix threading issues - I
+	  think.
+
+2006-03-22 15:04  dereksmithies
+
+	* samples/safetest/safetest.vcproj: Add a manually edited msvc 7
+	  project file.
+
+2006-03-21 22:26  dereksmithies
+
+	* samples/safetest/.cvsignore: Suppress cvs messages about some
+	  files not being in the repositary.
+
+2006-03-21 22:24  dereksmithies
+
+	* samples/safetest/: main.cxx, main.h: Tidyups. Add Pragmas. make
+	  it slightly more friendly for 1 cpu boxes.
+
+2006-03-19 18:24  csoutheren
+
+	* include/ptlib/: critsec.h, object.h, unix/ptlib/contain.h:
+	  Applied patch #1446482 Thanks to Adam Butcher
+
+2006-03-19 17:30  csoutheren
+
+	* src/ptlib/common/contain.cxx: Added patch#1451378 Thanks to Borko
+	  Jandras
+
+2006-03-17 00:56  csoutheren
+
+	* include/ptlib/videoio.h, src/ptlib/common/vfakeio.cxx: Exposed
+	  video fonts to external access
+
+2006-03-17 00:54  csoutheren
+
+	* include/ptclib/pvfiledev.h, src/ptclib/pvfiledev.cxx: Removed
+	  unused member variable
+
+2006-03-13 17:34  csoutheren
+
+	* src/ptclib/sockagg.cxx: Added log message when handle creates
+	  aggregator
+
+2006-03-13 01:49  csoutheren
+
+	* include/ptclib/pvfiledev.h: Added newline at end of file
+

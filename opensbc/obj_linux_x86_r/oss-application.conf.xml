@@ -1,0 +1,52 @@
+<Root_Element>
+  <Application>OpenSBC</Application>
+  <HTTPPort>9999</HTTPPort>
+  <ConfigurationPage Title="OpenSBC General Parameters">
+    <Parameters>
+      <!--types:  string, list, integer, boolean, password, selection-->
+      <Item Comment="1=Fatal only, 2=Errors, 3=Warnings, 4=Info, 5=Debug" Type="integer" Default="3" Minimum="0" Maximum="5" Length="25">Application Log Level</Item>
+      <Item Comment="1=Fatal only, 2=Errors, 3=Warnings, 4=Info, 5=Debug" Type="integer" Default="3" Minimum="0" Maximum="5" Length="25">SIP and RTP Log Level</Item>
+      <Item Comment="SBC Mode (Requires restart!)" Type="selection" Default="Full Mode" Minimum="0" Maximum="0" Length="0" Items="Full Mode, Proxy Only Mode, B2B Only Mode, B2BUpperReg Mode">SBC Mode</Item>
+      <Item Comment="Enable proxying media on all incoming call" Type="boolean" Default="0" Minimum="0" Maximum="1" Length="1">Always Proxy Media</Item>
+      <Item Comment="Prefix for the application log file" Type="string" Default="b2bua" Minimum="" Maximum="" Length="25">Application Log File</Item>
+      <Item Comment="The interface address (in SIP URI format) where OpenSBC would bind its listener.  If left blank it will default to sip:*:5060 and bind to all available interfaces.  Changing this value would require a restart before it takes effect" Type="string" Default="sip:*:5060" Minimum="" Maximum="" Length="50">Interface Address</Item>
+      <Item Comment="The Syslog interface Address (IP/Domain format) where OpenSBC would send it's log. If left blank it will default to localhost" Type="string" Default="127.0.0.1" Minimum="" Maximum="" Length="50">Syslog Server</Item>
+      <Item Comment="Enable SIP Session Timer" Type="boolean" Default="0" Minimum="0" Maximum="1" Length="1">SIP Session Timer</Item>
+      <Item Comment="First Hash Key encryption" Type="integer" Default="0" Minimum="0" Maximum="65536" Length="25">Hash Key 1</Item>
+      <Item Comment="Second Hash Key encryption" Type="integer" Default="0" Minimum="0" Maximum="255" Length="25">Hash Key 2</Item>
+      <Item Comment="The number of worker threads for handling SIP transactions.  Changing this value would require a restart before it takes effect" Type="integer" Default="10" Minimum="1" Maximum="100" Length="50">Transaction Thread Count</Item>
+      <Item Comment="The number of worker threads for handling SIP Session Events.  Changing this value would require a restart before it takes effect" Type="integer" Default="10" Minimum="1" Maximum="100" Length="50">Session Thread Count</Item>
+      <Item Comment="The amount of time (milliseconds) outbound calls should wait before a 1xx is received for an Invite" Type="integer" Default="5000" Minimum="1000" Maximum="10000" Length="50">1xx Timeout To Invite</Item>
+      <Item Comment="The amount of time (milliseconds) inbound calls should wait after sending an invite. By default the value is 0 which is Infinite" Type="integer" Default="60000" Minimum="0" Maximum="100000" Length="50">Connection Timeout</Item>
+      <Item Comment="The amount of time (milliseconds) inbound calls should wait after receiving an alerting. By default the value is 0 which is Infinite" Type="integer" Default="30000" Minimum="0" Maximum="100000" Length="50">Alerting Timeout</Item>
+      <Item Comment="The amount of time (milliseconds) outbound calls should wait before a 1xx is received for an Invite" Type="integer" Default="60000" Minimum="1000" Maximum="120000" Length="50">Final Response Timeout To Invite</Item>
+      <Item Comment="Sessions currently running/active on OpenSBC" Type="integer" Default="0" Minimum="0" Maximum="0" Length="25">Active Sessions</Item>
+    </Parameters>
+  </ConfigurationPage>
+  <ConfigurationPage Title="Local Domain Accounts">
+    <Parameters>
+      <!--types:  string, list, integer, boolean, password-->
+      <Item Comment="Flag to indicate whether we accept all registration" Type="boolean" Default="0" Minimum="0" Maximum="1" Length="1">Accept All Registration</Item>
+      <Item Comment="Example:  sip:alice:alicepass@example.opensipstack.org where &quot;alice&quot; is the authentication user and &quot;alicepass&quot; is the authentication password" Type="list" Default="" Minimum="" Maximum="" Length="50">Account</Item>
+    </Parameters>
+  </ConfigurationPage>
+  <ConfigurationPage Title="OpenSBC Routes">
+    <Parameters>
+      <!--types:  string, list, integer, boolean, password-->
+      <Item Comment="Flag to indicate whether the To URI in outbound INVITEs will be rewritten based on route entries " Type="boolean" Default="0" Minimum="0" Maximum="1" Length="1">Rewrite TO URI</Item>
+      <Item Comment="Example 1: [sip:*@example.opensipstack.org:*] sip:p1.opensipstack.org:5060, sip:p2.opensipstack.org:5060 Example 2: [sip:1212*@opensipstack.org:*] sip:p3.opensipstack.org, sip:200.1.1.200 Example 3: [sip:1212*@opensipstack.org:*] sip:p2.opensipstack.org | sip:p3.opensipstack.org, sip:200.1.1.200 | sip:200.1.1.240" Type="list" Default="" Minimum="" Maximum="" Length="200">Route</Item>
+    </Parameters>
+  </ConfigurationPage>
+  <ConfigurationPage Title="Relay Routes">
+    <Parameters>
+      <!--types:  string, list, integer, boolean, password-->
+      <Item Comment="Example 1: [sip:*@example.opensipstack.org:*] sip:p1.opensipstack.org:5060, sip:p2.opensipstack.org:5060 Example 2: [sip:1212*@opensipstack.org:*] sip:p3.opensipstack.org, sip:200.1.1.200" Type="list" Default="" Minimum="" Maximum="" Length="200">Route</Item>
+    </Parameters>
+  </ConfigurationPage>
+  <ConfigurationPage Title="Upper Registration Routes">
+    <Parameters>
+      <!--types:  string, list, integer, boolean, password-->
+      <Item Comment="Example  [sip:*@example.opensipstack.org:*] sip:p1.opensipstack.org:5060" Type="list" Default="" Minimum="" Maximum="" Length="50">Route</Item>
+    </Parameters>
+  </ConfigurationPage>
+</Root_Element>

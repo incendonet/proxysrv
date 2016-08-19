@@ -1,0 +1,36 @@
+
+
+
+PREFIX=@INSTALLPREFIX@
+exec_prefix = $(PREFIX)
+LIBDIR=@LIBDIR@
+export OPENSIPSTACKDIR=@OPENSIPSTACKDIR@
+
+INSTALL=@INSTALL@
+
+default :: optnoshared
+
+all :: bothnoshared
+
+include $(OPENSIPSTACKDIR)/make/opensipstack.mak
+
+SUBDIRS := src/pwlib src
+
+
+
+PREFIX=@INSTALLPREFIX@
+exec_prefix = ${PREFIX}
+LIBDIR=@LIBDIR@
+
+ifndef PREFIX
+PREFIX=/usr/local
+endif
+
+
+# standard build command
+# all these targets are just passed to all subdirectories
+$(subst tagbuild,,$(STANDARD_TARGETS)) ::
+	set -e; $(foreach dir,$(SUBDIRS),$(MAKE) -C $(dir) $@;)
+
+
+
