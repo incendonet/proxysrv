@@ -257,15 +257,6 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 	SIPURI target = to.GetURI();
 	SIPURI targetURI;
 
-#if 0
-	if( SIPTransport::IsLocalAddress( target ) )
-	{
-		/// we dont proxy local domain routing
-		if( m_RelayRoutes.FindRoute( request, targetURI, TRUE ) )
-			return ProxySession::RouteReject;
-	}
-#endif
-
 	RequestLine requestLine;
 	request.GetRequestLine( requestLine );
 	SIPURI oldURI = requestLine.GetRequestURI();
@@ -324,9 +315,6 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 	}
 	else if (request.IsBusyHere())	// FIX - Also check that request.GetCSeq().GetMethod() is 'INVITE'?
 	{
-#if 0
-		return RouteProxyNISTRequest( session, request );
-#else
 		// Do FindRoute to get next URI in Target array
 		BOOL		bRes = FALSE;
 		BOOL		relay = FALSE;
@@ -346,22 +334,7 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 		}
 		else
 		{
-#if 0
-//			PTRACE(1, "### BUSYHERE found prev-invite, about to FindRoute for CallId: " << request.GetCallId());
-			if(!m_AppRelayRoutes.FindRoute(*pPrevInvite, targetURI, allowRoundRobin, TRUE ))
-			{
-				if(m_RelayRoutes.FindRoute(*pPrevInvite, targetURI, allowRoundRobin, TRUE ))
-				{
-					relay = TRUE;
-				}
-			}
-			else
-			{
-				relay = TRUE;
-			}
-#else		// Don't bother with FindRoute, next pass through (after we've EnqueueSessionEvent() the new Invite event) will do it.
 			relay = TRUE;
-#endif
 		}
 
 		if(!relay)
@@ -401,55 +374,7 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 			SIPURI routeURI;
 
 			PIPSocket::Address targetAddress, listenerAddress;
-			//WORD targetPort = 0, listenerPort = 0;
 
-			/*
-			if( !SIPTransport::Resolve( targetURI, targetAddress, targetPort ) )
-			{
-				PTRACE( 1, "(2) Unable to resolve target UA for  " << newRequest.GetStartLine() );
-				LOG( LogError(), "(2) Unable to resolve target UA for  " << newRequest.GetStartLine() );
-				return ProxySession::RouteReject;
-			}
-
-			if( !GetB2BUA().GetStack().GetTransportManager()->GetListenerAddress(
-				SIPTransport::UDP, targetAddress, listenerAddress, listenerPort ) )
-			{
-				PTRACE( 1, "Unable to identify a network interface for  " << newRequest.GetStartLine() );
-				LOG( LogError(), "Unable to identify a network interface for  " << newRequest.GetStartLine() );
-				return ProxySession::RouteReject; 
-			}
-
-			routeURI.SetHost( listenerAddress.AsString() );
-			routeURI.SetPort( PString( listenerPort ) );
-//PTRACE(1, "### BUSYHERE 2 AsString: " << newRequest.AsString());
-
-
-			if( SIPTransport::IsPrivateNetwork( listenerAddress ) && !SIPTransport::IsPrivateNetwork( newRequest.GetTopContactURI().GetAddress() ) )
-			{
-				/// public to private routing... lets tag the record route
-				PIPSocket::Address shiftAddress;
-				WORD shiftPort;
-
-				GetB2BUA().GetStack().GetTransportManager()->GetListenerAddress(
-					SIPTransport::UDP, newRequest.GetTopContactURI().GetAddress(), shiftAddress, shiftPort );
-				PString routeShift = shiftAddress.AsString() + ":" + PString( shiftPort );
-
-				routeURI.AddParameter( "route-shift", routeShift );
-			}
-//PTRACE(1, "### BUSYHERE 3 AsString: " << newRequest.AsString());
-
-//			recordRoute.SetURI( routeURI );
-//			recordRoute.SetLooseRouter( TRUE );
-//			newRequest.AppendRecordRoute( recordRoute );
-			oldURI.SetHost( targetURI.GetHost() );
-			oldURI.SetPort( targetURI.GetPort() );
-
-			To	tmpTo;
-			newRequest.GetTo(tmpTo);						// FIX - Is this always correct?
-			oldURI.SetUser( tmpTo.GetURI().GetUser() );
-
-			requestLine.SetRequestURI( oldURI );
-			*/
 			requestLine.SetMethod("INVITE");
 			newRequest.SetStartLine( requestLine );
 
@@ -460,7 +385,6 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 			//return RouteProxyNISTRequest(session, request);
 			return ProxySession::RouteIgnore;
 		}
-#endif
 	} // if(busyhere)
 	else if(request.IsOkToInvite())
 	{
@@ -538,11 +462,7 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 
 				routeURI.AddParameter( "route-shift", routeShift );
 			}
-#if 0
-			recordRoute.SetURI( routeURI );
-			recordRoute.SetLooseRouter( TRUE );
-			request.AppendRecordRoute( recordRoute );
-#endif
+
 			oldURI.SetHost( targetURI.GetHost() );
 			oldURI.SetPort( targetURI.GetPort() );
 
