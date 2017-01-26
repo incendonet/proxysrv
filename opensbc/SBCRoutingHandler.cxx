@@ -390,14 +390,11 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 	{
 		BOOL	bRes = FALSE;
 
-//		PTRACE(1, "### OK to INVITE, removing CallId: " << request.GetCallId());
-
 		// FIX - Will it even get here, since an "OK" isn't a request?
 		// Clear the invite entry from the list
 		bRes = FindAndRemovePendingInviteByCallId(request.GetCallId());
 		if(!bRes)
 		{
-//			PTRACE(1, "### No prev-invite found for CallId: " << request.GetCallId());
 		}
 
 		// Do default routing
@@ -408,8 +405,6 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 		BOOL relay = FALSE;
 		BOOL allowRoundRobin = request.IsInvite();
 
-
-//PTRACE(1, "### !IsCancel && !IsAck for CallId: " << request.GetCallId() << "starting with: " << request.AsString());
 		if( !m_AppRelayRoutes.FindRoute( request, targetURI, allowRoundRobin, TRUE ) )
 		{
 			if( m_RelayRoutes.FindRoute( request, targetURI, allowRoundRobin, TRUE ) )
@@ -421,7 +416,6 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 
 		if( relay )
 		{
-//PTRACE(1, "### !IsCancel && !IsAck for CallId: " << request.GetCallId() << ", found route: " << targetURI);
 			session.SetCreateDialog();
 			session.SetDialogPeerAddress( targetURI.AsString() );
 
@@ -468,16 +462,12 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 
 			requestLine.SetRequestURI( oldURI );
 			request.SetStartLine( requestLine );
-//PTRACE(1, "### INVITE startline: " << request.GetStartLine());
 
 			if(request.IsInvite())
 			{	// Save the Invite in case it needs to be re-used if the UA was busy (see case above.)
-				//PTRACE(1, "### Saving INVITE for CallId: " << request.GetCallId() << "  AsString: " << request.AsString());
-
 				AddPendingInvite(request);
 			}
 
-//PTRACE(1, "### !IsCancel && !IsAck for CallId: " << request.GetCallId() << "ending with: " << request.AsString());
 			return ProxySession::RouteBySession;
 		}
 		else
@@ -505,7 +495,6 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 	}
 	else if(  ( request.IsCancel() || request.IsAck() ) )
 	{
-//PTRACE(1, "### IsCancel || IsAck for CallId: " << request.GetCallId() << "starting with: " << request.AsString());
 		targetURI = session.GetDialogPeerAddress();
 		targetURI.SetUser( oldURI.GetUser() );
 		requestLine.SetRequestURI( targetURI );
@@ -532,12 +521,10 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 	}
 	else if( !request.IsRequest() )
 	{
-//PTRACE(1, "### Not IsRequest CallId: " << request.GetCallId() << "starting with: " << request.AsString());
 		OnRecordRouteShift( request );
 	}
 	else
 	{
-//PTRACE(1, "### else for CallId: " << request.GetCallId() << "starting with: " << request.AsString());
 		return RouteProxyNISTRequest( session, request );
 	}
 
