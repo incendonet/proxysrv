@@ -170,7 +170,7 @@ public:
 
 	void AddPendingInvite(const SIPMessage & i_msgInvite);
 	BOOL FindAndRemovePendingInviteByCallId(const PString & i_sCallid);
-	SIPMessage * FindPendingInviteByCallId(const PString & i_sCallid);
+	PendingInvite * FindPendingInviteByCallId(const PString & i_sCallid);
 
 private:
 	Router m_StaticRoutes;

@@ -118,6 +118,7 @@ static const char configKeyUpperRegistrarSection[] = "Upper Registration Routes"
 static const char configKeyRelayRouteSection[] = "Relay Routes";
 static const char configKeyRoute[] = "Route";
 static const char configKeyRewriteToURI[] = "Rewrite TO URI";
+static const char configKeyOnBusyForwardDest[] = "On Busy Forward Dest";
 
 SBCRoutingHandler::SBCRoutingHandler(  
 									 OpenSBC & b2bua 
@@ -316,38 +317,99 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 	else if (request.IsBusyHere())	// FIX - Also check that request.GetCSeq().GetMethod() is 'INVITE'?
 	{
 		// Do FindRoute to get next URI in Target array
-		BOOL		bRes = FALSE;
-		BOOL		relay = FALSE;
-		//BOOL		allowRoundRobin = TRUE;
-		SIPMessage	*pPrevInvite = 0, newRequest;
-		Via			newVia, origVia;
+		BOOL			bRes = FALSE;
+		SIPMessage		*pPrevInvite = NULL, newRequest;
+		PendingInvite	*pPending = NULL;
+		Via				newVia, origVia;
 
-//		PTRACE(1, "### BUSYHERE for CallId: " << request.GetCallId());
+		PTRACE(3, "### BUSYHERE for CallId: " << request.GetCallId());
 
 		// Find the matching Invite
-		pPrevInvite = FindPendingInviteByCallId(request.GetCallId());
-		if(pPrevInvite == 0)
+		pPending = FindPendingInviteByCallId(request.GetCallId());
+		if(pPending == NULL)
 		{
 			// Didn't find the prev-invite, return the busyhere.
-//			PTRACE(1, "### BUSYHERE (FindPendingInviteByCallId failed) returning BH for CallId: " << request.GetCallId());
-			relay = FALSE;
-		}
-		else
-		{
-			relay = TRUE;
-		}
-
-		if(!relay)
-		{
-			// FIX - Should route call to overflow extension/address.
-			// Do default routing.
-//			PTRACE(1, "### BUSYHERE (FindRoute failed), returning BH for CallId: " << request.GetCallId());
+			PTRACE(2, "### BUSYHERE FindPendingInviteByCallId failed for CallId: " << request.GetCallId());
 			return RouteProxyNISTRequest( session, request );
 		}
+		else if(pPending->m_iRemainingRetries == 0)
+		{
+			// All UAs are busy, route to on-busy-forward destination
+			OSSAppConfig	*config = OSSAppConfig::GetInstance();
+			SIPURI			sOBFDest;
+			PStringStream	sTmp;
+
+			pPrevInvite = pPending->m_pmInvite;
+
+			sOBFDest = config->GetString(configKeySection, configKeyOnBusyForwardDest, "");
+			if(sOBFDest.AsString() == "")
+			{
+				// Don't have an OBF desination, so do default routing (return busy-here.)
+				PTRACE(1, "### OBF (FindRoute failed), returning BH for CallId: " << request.GetCallId());
+
+				FindAndRemovePendingInviteByCallId(request.GetCallId());	// Free up the pending invite
+				return RouteProxyNISTRequest( session, request );
+			}
+			else
+			{
+				// Send Invite to address from config settings
+				PTRACE(1, "### Passing Invite for CallId: " << request.GetCallId() << " to " << sOBFDest.AsString());
+
+				newRequest = pPrevInvite->AsString();	// Inefficient way to copy msg...
+
+				// Reset the 'Via' (assumes 1'st line is what we'll work with.)
+				bRes = newRequest.GetViaAt(0, origVia);
+				newVia.SetProtocol(origVia.GetProtocol());
+				newVia.SetAddress(origVia.GetAddress());
+				newVia.SetPort(origVia.GetPort());
+				newVia.SetBranch(origVia.GetBranch());
+				newVia.SetRPort(origVia.GetRPort());
+				newVia.SetReceiveAddress(origVia.GetReceiveAddress());
+
+				newRequest.RemoveAllVias();
+				newRequest.AppendVia(newVia);
+				session.SetCreateDialog();
+				//session.SetDialogPeerAddress( targetURI.AsString() );
+
+				// Set the request line
+				requestLine.SetMethod("INVITE");
+				requestLine.SetRequestURI(sOBFDest);
+				newRequest.SetStartLine( requestLine );
+
+				// Set to To header
+				sTmp << "<" << sOBFDest << ">";
+				newRequest.SetTo(sTmp);
+
+				// Set Contact header
+				SIPURI				tempUri = request.GetToURI();
+				ContactList			contactList;
+				Contact				contact;
+				ContactURI			contactURI;
+
+				newRequest.RemoveAllContact();		// Need to RemoveAll then Set, because RemoveAll by itself doesn't
+													// clear the ContactList, and Set without first calling RemoveAll
+													// results in two Contact lines.  BDA 20170201
+
+				contactURI.SetURI(tempUri);
+				contact.AddURI(contactURI);
+				contactList.Append(contact);
+				newRequest.SetContactList(contactList);
+
+				PTRACE(2, "### OBF 4 newRequest.AsString: " << newRequest.AsString());
+
+				session.EnqueueSessionEvent(new SIPSessionEvent(session, session.EventValidateRequest, newRequest));
+
+				// Free up the pending invite
+				FindAndRemovePendingInviteByCallId(request.GetCallId());
+
+				return ProxySession::RouteIgnore;
+			}
+		}
 		else
 		{
-			//PTRACE(1, "### BUSYHERE attempting INVITE reroute for CallId: " << newRequest.GetCallId() << " to URI: " << targetURI);
+			PTRACE(2, "### BUSYHERE attempting INVITE reroute for CallId: " << request.GetCallId());
 
+			pPrevInvite = pPending->m_pmInvite;
 			newRequest = pPrevInvite->AsString();	// Inefficient way to copy msg...
 
 			// Reset the 'Via' (assumes 1'st line is what we'll work with.)
@@ -367,22 +429,12 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 			//
 
 			session.SetCreateDialog();
-//PTRACE(1, "### BUSYHERE 1 AsString: " << newRequest.AsString());
-			//session.SetDialogPeerAddress( targetURI.AsString() );
-
-			RouteURI recordRoute;
-			SIPURI routeURI;
-
-			PIPSocket::Address targetAddress, listenerAddress;
 
 			requestLine.SetMethod("INVITE");
 			newRequest.SetStartLine( requestLine );
 
-//PTRACE(1, "### BUSYHERE 4 AsString: " << newRequest.AsString());
-
 			session.EnqueueSessionEvent(new SIPSessionEvent(session, session.EventValidateRequest, newRequest));
 
-			//return RouteProxyNISTRequest(session, request);
 			return ProxySession::RouteIgnore;
 		}
 	} // if(busyhere)
@@ -396,6 +448,10 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 		if(!bRes)
 		{
 		}
+		else
+		{
+			PTRACE(2, "### FindAndRemovePendingInviteByCallId CallId: " << request.GetCallId() << " to URI: " << targetURI);
+		}
 
 		// Do default routing
 		return RouteProxyNISTRequest( session, request );
@@ -405,11 +461,16 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 		BOOL relay = FALSE;
 		BOOL allowRoundRobin = request.IsInvite();
 
+//PTRACE(1, "### HERE for CallId: " << request.GetCallId() << " to URI: " << targetURI);
+
 		if( !m_AppRelayRoutes.FindRoute( request, targetURI, allowRoundRobin, TRUE ) )
 		{
 			if( m_RelayRoutes.FindRoute( request, targetURI, allowRoundRobin, TRUE ) )
+			{
 				relay = TRUE;
-		}else
+			}
+		}
+		else
 		{
 			relay = TRUE;
 		}
@@ -684,27 +745,18 @@ void SBCRoutingHandler::OnRecordRouteShift(
 void SBCRoutingHandler::AddPendingInvite(const SIPMessage & i_msgInvite)
 {
 	PendingInvite		*pPI = 0;
+	int					iNumTargets = 0;
+	PString				sCallid;
 
 	PWaitAndSignal		lock(m_PILMutex);
 
-	PString				sCallid;
-
 	pPI = new PendingInvite();
 	sCallid = i_msgInvite.GetCallId();
-#if 0
-	pPI->Init(i_msgInvite, sCallid, (m_AppRelayRoutes.GetRoutes().GetSize() + m_RelayRoutes.GetRoutes().GetSize()));
-#else
-	int		iAppRelayRoutes, iRelayRoutes, iNumTargets;
 
-	iAppRelayRoutes = m_AppRelayRoutes.GetRoutes().GetSize();
-	iRelayRoutes = m_RelayRoutes.GetRoutes().GetSize();
-	
 	// Get the number of targets in the first route, assume all routes have the same number.
 	iNumTargets = m_RelayRoutes.GetRoutes()[0].GetTargetURICount();
 	
-//PTRACE(5, "###### AppRelayRoutes: " << iAppRelayRoutes << ", RelayRoutes: " << iRelayRoutes << ", NumTargets: " << iNumTargets);
 	pPI->Init(i_msgInvite, sCallid, iNumTargets);
-#endif
 
 	m_PendingInviteList.Append(pPI);
 }
@@ -720,12 +772,12 @@ BOOL SBCRoutingHandler::FindAndRemovePendingInviteByCallId(const PString & i_sCa
 
 	iEnd = m_PendingInviteList.GetSize();
 
-	// FIX - Linear search time, yuck...  Use a Map instead?
+	// FIX - Inefficient search, use a Map instead?
 	for(ii = 0; ( (ii < iEnd) && (iIndex == -1) ); ii++)
 	{
 		if(m_PendingInviteList[ii].m_sCallid == i_sCallid)
 		{
-PTRACE(2, "#####FindAndRemovePendingInviteByCallId Found callid at index:   " << ii << ".  Total remaining:  " << m_PendingInviteList.GetSize());
+			PTRACE(3, "##### FindAndRemovePendingInviteByCallId Found callid at index:   " << ii << ".  Total remaining:  " << m_PendingInviteList.GetSize());
 			iIndex = ii;
 			m_PendingInviteList.RemoveAt(iIndex);
 		}
@@ -737,31 +789,47 @@ PTRACE(2, "#####FindAndRemovePendingInviteByCallId Found callid at index:   " <<
 /////////////////////////////////////////////////////////////////////////////////////
 //	Find previous Invite that has a matching CallId
 /////////////////////////////////////////////////////////////////////////////////////
-SIPMessage * SBCRoutingHandler::FindPendingInviteByCallId(const PString & i_sCallid)
+PendingInvite * SBCRoutingHandler::FindPendingInviteByCallId(const PString & i_sCallid)
 {
-	SIPMessage	*pRet = 0;
-	PINDEX		ii, iEnd = 0;
-	BOOL		bDone = FALSE;
+	PendingInvite	*pRet = 0;
+	PINDEX			ii, iEnd = 0;
+	BOOL			bDone = FALSE, bOBF = FALSE;
+	SIPURI			sOBFDest;
+	OSSAppConfig	*config = OSSAppConfig::GetInstance();
 
+	// Check if OBF is enabled
+	sOBFDest = config->GetString(configKeySection, configKeyOnBusyForwardDest, "");
+	if(sOBFDest.AsString() != "")
+	{
+		bOBF = TRUE;
+	}
+
+	// Block before checking the list
 	PWaitAndSignal lock(m_PILMutex);
 
 	iEnd = m_PendingInviteList.GetSize();
-PTRACE(2, "### FindPendingInviteByCallId: " << i_sCallid << ", PendingInvites: " << iEnd);
+//PTRACE(2, "### FindPendingInviteByCallId: " << i_sCallid << ", PendingInvites: " << iEnd);
 
-	// FIX - Linear search time, yuck...  Use a Map instead?
+	// FIX - Inefficient search, use a Map instead?
 	for(ii = 0; ( (ii < iEnd) && (bDone == FALSE) ); ii++)
 	{
-		if(m_PendingInviteList[ii].m_sCallid == i_sCallid)
+		if(m_PendingInviteList[ii].m_sCallid == i_sCallid)	// If we have a match
 		{
-			if(m_PendingInviteList[ii].m_iRemainingRetries > 0)
+			if(m_PendingInviteList[ii].m_iRemainingRetries > 0)		// If we have remaining retries
 			{
 				// If we found it, decrement the retries and return it.
-				pRet = m_PendingInviteList[ii].m_pmInvite;
+				pRet = &(m_PendingInviteList[ii]);
 				m_PendingInviteList[ii].m_iRemainingRetries--;
+			}
+			else if( (m_PendingInviteList[ii].m_iRemainingRetries == 0) && (bOBF) )
+			{
+				PTRACE(2, "### Found PendingInviteByCallId and out of retries, but OBF: " << i_sCallid << ", ii==" << ii);
+				pRet = &(m_PendingInviteList[ii]);
 			}
 			else
 			{
-				PTRACE(2, "### FoundPendingInviteByCallId: " << i_sCallid);
+				PTRACE(2, "### Found PendingInviteByCallId but out of retries: " << i_sCallid << ", ii==" << ii);
+
 				// If we've run out of retries, remove it from the list and return.
 				m_PendingInviteList.RemoveAt(ii);
 			}
