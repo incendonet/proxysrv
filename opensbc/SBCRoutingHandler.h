@@ -181,6 +181,8 @@ private:
 	Router m_AppUpperRegistrationRoutes;
 	Router m_AppRelayRoutes;
 
+	Router m_OBFRoutes;							// On-busy-forward routes
+
 	PLIST(PendingInviteList, PendingInvite);
 	PendingInviteList	m_PendingInviteList;
 	PMutex				m_PILMutex;

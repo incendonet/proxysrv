@@ -118,7 +118,8 @@ static const char configKeyUpperRegistrarSection[] = "Upper Registration Routes"
 static const char configKeyRelayRouteSection[] = "Relay Routes";
 static const char configKeyRoute[] = "Route";
 static const char configKeyRewriteToURI[] = "Rewrite TO URI";
-static const char configKeyOnBusyForwardDest[] = "On Busy Forward Dest";
+static const char configKeyOnBusyForwardSection[] = "On-Busy-Forward Routes";
+static const char configKeyOnBusyForwardRoute[] = "OBFRoute";
 
 SBCRoutingHandler::SBCRoutingHandler(  
 									 OpenSBC & b2bua 
@@ -154,6 +155,21 @@ void SBCRoutingHandler::RefreshStaticRoutes()
 
 	if( relayRoutes.GetSize() > 0 )
 		m_RelayRoutes.Parse( relayRoutes );
+
+	PStringArray obfRoutes;
+	for( PINDEX x = 0; x <  config->GetListSize( configKeyOnBusyForwardSection, configKeyOnBusyForwardRoute ); x++ )
+	{
+		obfRoutes.AppendString( config->GetListItem( configKeyOnBusyForwardSection, configKeyOnBusyForwardRoute, x ) );
+	}
+
+	if( obfRoutes.GetSize() > 0 )
+	{
+		m_OBFRoutes.Parse( obfRoutes );
+	}
+	else
+	{
+		PTRACE(1, "No on-busy-forward routes found in config.");
+	}
 }
 
 BOOL SBCRoutingHandler::B2BRouteRequest(
@@ -335,14 +351,12 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 		else if(pPending->m_iRemainingRetries == 0)
 		{
 			// All UAs are busy, route to on-busy-forward destination
-			OSSAppConfig	*config = OSSAppConfig::GetInstance();
 			SIPURI			sOBFDest;
 			PStringStream	sTmp;
 
 			pPrevInvite = pPending->m_pmInvite;
 
-			sOBFDest = config->GetString(configKeySection, configKeyOnBusyForwardDest, "");
-			if(sOBFDest.AsString() == "")
+			if(!m_OBFRoutes.FindRoute(*pPrevInvite, sOBFDest, TRUE, TRUE))
 			{
 				// Don't have an OBF desination, so do default routing (return busy-here.)
 				PTRACE(1, "### OBF (FindRoute failed), returning BH for CallId: " << request.GetCallId());
@@ -369,7 +383,6 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 				newRequest.RemoveAllVias();
 				newRequest.AppendVia(newVia);
 				session.SetCreateDialog();
-				//session.SetDialogPeerAddress( targetURI.AsString() );
 
 				// Set the request line
 				requestLine.SetMethod("INVITE");
@@ -795,13 +808,15 @@ PendingInvite * SBCRoutingHandler::FindPendingInviteByCallId(const PString & i_s
 	PINDEX			ii, iEnd = 0;
 	BOOL			bDone = FALSE, bOBF = FALSE;
 	SIPURI			sOBFDest;
-	OSSAppConfig	*config = OSSAppConfig::GetInstance();
 
 	// Check if OBF is enabled
-	sOBFDest = config->GetString(configKeySection, configKeyOnBusyForwardDest, "");
-	if(sOBFDest.AsString() != "")
+//	if(m_OBFRoutes.FindRoute(request, sOBFDest, TRUE, TRUE))
+	if(m_OBFRoutes.GetRoutes().GetSize() > 0)
 	{
-		bOBF = TRUE;
+		if(sOBFDest.AsString() != "")
+		{
+			bOBF = TRUE;
+		}
 	}
 
 	// Block before checking the list
