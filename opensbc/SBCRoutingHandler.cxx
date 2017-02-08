@@ -367,7 +367,7 @@ ProxySession::RoutePolicy SBCRoutingHandler::RouteProxyRequest(
 			else
 			{
 				// Send Invite to address from config settings
-				PTRACE(1, "### Passing Invite for CallId: " << request.GetCallId() << " to " << sOBFDest.AsString());
+				PTRACE(1, "    -->> All ports in use, passing Invite for CallId: " << request.GetCallId() << " to " << sOBFDest.AsString());
 
 				newRequest = pPrevInvite->AsString();	// Inefficient way to copy msg...
 
